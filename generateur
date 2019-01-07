@@ -1,0 +1,86 @@
+// Génère le traffic routier.
+// À chaque frame il vérifie si il peut interpeller le Generateur()
+// 
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class generateurTraffic : MonoBehaviour
+{
+    // mes variables
+    public GameObject[] voiture;
+    public float tempsGeneration = 1.5f;
+    private bool canGenerate = true;
+    public int numberOfCar = 0;
+    public float coolDownGenerationInSec = 1f;
+    float positionX;
+    float positionY;
+    float positionZ;
+    public float timeStamp = 0f;
+    public float tempsDisplay;
+
+    void Awake()
+    {
+        positionX = transform.position.x;
+        positionY = transform.position.y;
+        positionZ = transform.position.z;
+
+        // intialize var
+    }
+
+    void Update()
+    {
+        tempsDisplay = Time.time;
+        if(canGenerate)
+        {
+            Debug.Log("isGenere");
+            Generateur();
+            canGenerate = false;
+        }
+        if (timeStamp <= Time.time)
+        {
+            canGenerate = true;          
+        }
+ 
+    }
+
+    //  LE GÉNÉRATEUR
+    void Generateur()
+    {
+        if (timeStamp <= Time.time)
+        {
+            Debug.Log("instatiating");
+            // randomize vehicle
+            Random rnd = new Random();
+            numberOfCar = voiture.Length;
+            int rangeOfCars = Random.Range(0, (voiture.Length));
+
+            // generate the car
+            Instantiate(voiture[rangeOfCars], new Vector3(positionX, positionY, positionZ), transform.rotation);
+
+            // make a timestamp for cooldown period
+            timeStamp = Time.time + coolDownGenerationInSec;
+            canGenerate = true;
+        }
+    }
+
+    // // REGARDE POUR LES COLLISION
+    void OnTriggerEnter(Collider other)
+    {
+        canGenerate = false;
+        Debug.Log("something has entered generateur, can't generate");
+    }
+
+    void OnTriggerStay(Collider other)
+    {
+        canGenerate = false;
+        Debug.Log("something is staying in generateur, can't create");
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        canGenerate = true;
+        Debug.Log("something exiting generateur, can create");
+    }
+}
